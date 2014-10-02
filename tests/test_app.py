@@ -1,5 +1,5 @@
 
-from .example_app import *
+from simple_sqlalchemy.example_app import *
 
 KEEBLER_ELF = "Mary"
 
