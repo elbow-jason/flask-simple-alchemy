@@ -8,21 +8,17 @@ SQLALCHEMY_DATABASE_URI ='sqlite:///example.db'
 DEBUG = True
 SECRET_KEY = 'development key'
 
-#create app
-app = Flask(__name__)
+def create_app():
+    app = Flask(__name__)
+    return app
 
-#config app
-app.config.from_object(__name__)
+def config_app(app):
+    app.config.from_object(__name__)
 
-#init extensitions
+app = create_app()
+config_app(app)
 db = SQLAlchemy(app)
-
-
-
-
 
 if __name__ == '__main__':
     db.drop_all()
     db.create_all()
-    app.run()
-
