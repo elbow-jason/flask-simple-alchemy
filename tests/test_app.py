@@ -4,7 +4,7 @@ import simple_sqlalchemy.config as cfg
 
 
 def test_create_app():
-    app = Flask(__name__)
+    app = create_app()
     assert app.__dict__.has_key('url_map')
 
 def test_config_app():
