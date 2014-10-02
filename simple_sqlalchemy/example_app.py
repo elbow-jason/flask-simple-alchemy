@@ -3,20 +3,18 @@ from flask import Flask
 #import flask extensions
 from flask.ext.sqlalchemy import SQLAlchemy
 
-#config values
-SQLALCHEMY_DATABASE_URI ='sqlite:///example.db'
-DEBUG = True
-SECRET_KEY = 'development key'
+import config
 
 def create_app():
     app = Flask(__name__)
     return app
 
-def config_app(app):
-    app.config.from_object(__name__)
+def config_app(app, config_obj):
+    app.config.from_object(config_obj)
+
 
 app = create_app()
-config_app(app)
+config_app(app, config)
 db = SQLAlchemy(app)
 
 if __name__ == '__main__':
