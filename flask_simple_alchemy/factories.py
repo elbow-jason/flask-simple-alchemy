@@ -2,7 +2,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import declared_attr
 import logging
 
-
+from factory_helpers import warn, kwarg_corrector
 class RelationshipFactories(object):
     """
     I hold the factories that return objects which can be used to 
@@ -47,45 +47,6 @@ class RelationshipFactories(object):
                 lazy=lazy))
 
 
-    def kwarg_corrector(self, **kwargs):
-        if kwargs['one_to_one'] and kwargs['one_to_many']:
-            raise Exception('relationship kwargs one_to_one and one_to_many'+\
-                            'at the same time.\n That doesn\'t even make'+\
-                            'sense. Choose one or the other not both.')
-
-        if kwargs['one_to_one']:
-            if kwargs['uselist'] == True:
-                self.override_warning('uselist', 'one_to_one',
-                                    'True', 'uselist', 'False')
-
-            if kwargs['lazy'] != 'select':
-                self.override_warning('lazy', 'one_to_one',
-                                     kwargs['lazy'], 'lazy','select')
-
-            #set one_to_one kwargs
-            kwargs['uselist'] = False
-            kwargs['lazy'] = "select"
-        
-        if kwargs['one_to_many']:
-            if kwargs['uselist'] == False:
-                self.override_warning('uselist', 'one_to_one', 'False',
-                                      'uselist', 'True')
-
-            if kwargs['lazy'] == 'dynamic':
-                logging.warning('lazy was unneccessarily specified.')
-            #set one_to_many kwargs
-            kwargs['uselist'] = True
-
-        if kwargs['uselist'] == False and kwargs['lazy'] != 'select':
-            self.override_warning('uselist', 'lazy', "not 'select'",
-                                'lazy' 'select')
-            kwargs['lazy'] = 'select'
-
-
-    def override_warning(self, str1, str2, val2, changed, override):
-        msg = "{} kwarg was specified with {} kwarg set as {}."+\
-            " Overriding {} to {}."
-        logging.warning(msg.format(str1, str2, val2, changed, override))
 
 
 

@@ -1,17 +1,19 @@
 from flask.ext.sqlalchemy import SQLAlchemy
+from sqlalchemy.ext.declarative import declared_attr
 
 from flask_simple_alchemy import RelationshipFactories
 
-from sqlalchemy.ext.declarative import declared_attr
 
 db = SQLAlchemy()
 fact = RelationshipFactories(db)
+
 
 class FakeTable(db.Model):
     __tablename__   = 'faketable'
     id              = db.Column(db.Integer, primary_key=True)
     unique_name     = db.Column(db.String, unique=True)
     non_unique_col  = db.Column(db.String)
+
 
 class OtherTable(db.Model):
     __tablename__   = 'othertable'
@@ -27,8 +29,6 @@ def test_RelationshipFactories_init():
         assert "initialization errored" is "Yes"
     assert isinstance(factr, RelationshipFactories)
     assert factr.db
-
-
 
 def test_RelationshipFactories_init_not_passed_SQLAlchemy_db_object():
     class BlankClass(object):
@@ -73,19 +73,8 @@ def test_foreign_key_factory():
 def test_relationship_func():
     rel1to1 = fact.relationship(FakeTable, 'FakeTable',
                                 uselist=False, lazy='select')
-    pass
-
-def test_kwarg_corrector_one_to_one_conflicts_one_to_many_kwargs_true():
-    kwargs = None
-    try:
-        kwargs = fact.test_kwarg_corrector(one_to_one=True, one_to_many=True)
-    except Exception as e:
-        pass
-    else:
-        raise Exception('relationship_kwarg_corrector did not throw error when\n'+\
-            'presented with one_to_one=True and one_to_many=True')
-    assert kwargs == None
-
+    assert rel1to1
+    assert type(rel1to1) is type(db.relationship('FakeTable'))
 
 def test_one_to_one_factory():
     #db = SQLAlchemy()
