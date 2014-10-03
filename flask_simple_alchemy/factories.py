@@ -55,28 +55,37 @@ class RelationshipFactories(object):
 
         if kwargs['one_to_one']:
             if kwargs['uselist'] == True:
-                self.override_warning('uselist', 'one_to_one', 'True', 'False')
+                self.override_warning('uselist', 'one_to_one',
+                                    'True', 'uselist', 'False')
+
             if kwargs['lazy'] != 'select':
                 self.override_warning('lazy', 'one_to_one',
-                                     kwargs['lazy'], 'select')
+                                     kwargs['lazy'], 'lazy','select')
+
             #set one_to_one kwargs
             kwargs['uselist'] = False
             kwargs['lazy'] = "select"
         
         if kwargs['one_to_many']:
             if kwargs['uselist'] == False:
-                self.override_warning('uselist', 'one_to_one', 'False', 'True')
+                self.override_warning('uselist', 'one_to_one', 'False',
+                                      'uselist', 'True')
+
             if kwargs['lazy'] == 'dynamic':
-                logging.warning('lazy was unneccessarily specified')
+                logging.warning('lazy was unneccessarily specified.')
             #set one_to_many kwargs
-            kwargs['uselist'] == True
+            kwargs['uselist'] = True
+
+        if kwargs['uselist'] == False and kwargs['lazy'] != 'select':
+            self.override_warning('uselist', 'lazy', "not 'select'",
+                                'lazy' 'select')
+            kwargs['lazy'] = 'select'
 
 
-    def override_warning(self, str1, str2, orig_val, override):
-        msg = "{str1} kwarg was specified with {str2} kwarg set as {orig_val}."+\
-            " Overriding {str1} to {override}."
-        logging.warning(msg.format(str1=str1, str2=str2, 
-                                    val2=val2, override=override))
+    def override_warning(self, str1, str2, val2, changed, override):
+        msg = "{} kwarg was specified with {} kwarg set as {}."+\
+            " Overriding {} to {}."
+        logging.warning(msg.format(str1, str2, val2, changed, override))
 
 
 
