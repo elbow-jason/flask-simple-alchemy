@@ -7,6 +7,8 @@ class RelationshipFactories(object):
         """
         I initialize the RelationshipFactories's instance.
         I expect an instance of the SQLAlchemy object.
+        If I don't get a SQLAlchemy object I will throw an Exception.
+
         Constructor.
 
             :param db:
