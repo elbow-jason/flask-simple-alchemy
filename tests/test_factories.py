@@ -9,6 +9,8 @@ def test_RelationshipFactories_init():
         fact = RelationshipFactories(db)
     except:
         assert "initialization errored" is "Yes"
+    assert isinstance(fact, RelationshipFactories)
+    assert fact.db
 
 
 
