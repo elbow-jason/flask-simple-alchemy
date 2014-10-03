@@ -1,8 +1,14 @@
+from flask.ext.SQLAlchemy import SQLAlchemy
 
 from flask_simple_alchemy import RelationshipFactories
 
+
 def test_RelationshipFactories_init():
-    pass
+    db = SQLAlchemy()
+    try:
+        fact = RelationshipFactories(db)
+    except:
+        assert "initialization errored" is "Yes"
 
 
 
