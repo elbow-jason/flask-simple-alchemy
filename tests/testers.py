@@ -6,6 +6,7 @@ def capture(messenger, msg, level='DEBUG'):
     with LogCapture() as l:
         messenger()
         l.check( ('root', level, msg),)
+    LogCapture.instances = set()
 
 def capture_any_log(messenger, msg):
     one_of_them_worked = False

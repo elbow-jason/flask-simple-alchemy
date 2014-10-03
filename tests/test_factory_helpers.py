@@ -55,9 +55,12 @@ def test_kwargs_corrector_one_to_one_and_uselist_true():
     kwargs['one_to_one'] = True
     kwargs['lazy'] = 'select'
 
-    with LogCapture() as l:
-        kwarg_corrector(**kwargs)
-        l.check( ('root', 'WARNING', msg),)
+    l = LogCapture()
+    new_kwargs = kwarg_corrector(**kwargs)
+    l.check( ('root', 'WARNING', msg),)
+    del l
+    assert new_kwargs['lazy'] == 'select'
+    assert new_kwargs['uselist'] == False
 
 
 

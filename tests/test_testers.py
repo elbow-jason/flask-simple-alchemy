@@ -5,6 +5,8 @@ def test_log_capture():
     with LogCapture() as l:
         logger.info('a message')
         l.check( ('root', 'INFO', 'a message'),)
+    LogCapture.instances = set()
+
 
 def test_capture():
     logger = logging.getLogger()
