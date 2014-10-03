@@ -8,7 +8,8 @@ db = SQLAlchemy()
 
 class FakeTable(db.Model):
     id   = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
+    unique_name = db.Column(db.String, unique=True)
+    non_unique_col = db.Column(db.String)
 
 
 def test_RelationshipFactories_init():
@@ -52,9 +53,11 @@ def test_foreign_key_func():
 def test_foreign_key_factory():
     fact = RelationshipFactories(db)
     FakeTableFKRelation = fact.foreign_key_factory('faketable')
-    print FakeTableFKRelation.__dict__
+    print FakeTableFKRelation.faketable_id.__dict__
     assert isinstance(FakeTableFKRelation.faketable_id, db.Column)
-    assert FakeTableFKRelation.faketable_id.__dict__ == 'wut'
+    testInt = db.Integer()
+    assert FakeTableFKRelation.faketable_id.type.__dict__ == testInt.__dict__
+
 
 
 
