@@ -11,7 +11,7 @@ setup(
     author='Jason Goldberger',
     license='MIT',
     author_email='jlgoldb2@asu.edu',
-    packages=["simple_sqlalchemy"],
+    packages=["flask_simple_alchemy"],
     include_package_data=True,
     zip_safe=False,
     platforms='any',
