@@ -1,8 +1,6 @@
 
 class RelationshipFactories(object):
 
-    def init_app(self, app):
-        
 
     def id_num_relation_factory(column_name, **kwargs):
         foreign_key  = kwargs.get('foreign_key', 'id')
