@@ -54,6 +54,7 @@ def test_foreign_key_factory():
     FakeTableFKRelation = fact.foreign_key_factory('faketable')
     print FakeTableFKRelation.__dict__
     assert isinstance(FakeTableFKRelation.faketable_id, db.Column)
+    assert FakeTableFKRelation.faketable_id.__dict__ == 'wut'
 
 
 
