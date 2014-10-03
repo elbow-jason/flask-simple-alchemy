@@ -1,4 +1,4 @@
-from flask.ext.SQLAlchemy import SQLAlchemy
+from flask.ext.sqlalchemy import SQLAlchemy
 
 from flask_simple_alchemy import RelationshipFactories
 
