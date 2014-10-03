@@ -2,6 +2,11 @@ from flask.ext.sqlalchemy import SQLAlchemy
 
 
 class RelationshipFactories(object):
+    """
+    I hold the factories that return objects which can be used to 
+    create extremely brief declaration of relationships between 
+    SQLAlchemy.Model (db.Model actually) objects.
+    """
 
     def __init__(self, db):
         """
