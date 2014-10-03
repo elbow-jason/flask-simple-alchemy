@@ -1,6 +1,6 @@
 
-from flask_simple_alchemy.example_app import *
-from flask_simple_alchemy import config
+from flask_simple_alchemy.examples.example_app import *
+from flask_simple_alchemy.examples import config
 
 
 def test_create_app():

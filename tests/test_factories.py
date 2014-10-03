@@ -7,4 +7,15 @@ def test_RelationshipFactories_init():
 
 
 def test_RelationshipFactories_init_not_passed_SQLAlchemy_db_object():
-    pass
+    class BlankClass(object):
+        pass
+
+    not_db = BlankClass()
+    errored = False
+    try:
+        fact = RelationshipFactories(not_db)
+        errored = True
+    except:
+        errored = False
+
+    assert not errored
