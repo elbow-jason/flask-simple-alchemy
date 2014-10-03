@@ -2,6 +2,8 @@
 import logging
 
 def kwarg_corrector(**kwargs):
+    defaults = default_relationship_kwargs()
+
     if kwargs['one_to_one'] and kwargs['one_to_many']:
         raise Exception('relationship kwargs one_to_one and one_to_many'+\
                         'at the same time.\n That doesn\'t even make'+\

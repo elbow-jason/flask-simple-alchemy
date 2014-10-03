@@ -1,9 +1,8 @@
 #test_factory_helpers.py
-import logging
-from testfixtures import LogCapture, log_capture
+
 from flask_simple_alchemy.factory_helpers import *
 
-
+from testers import *
 
 
 def default_kwargs():
@@ -15,8 +14,8 @@ def default_kwargs():
 def test_default_relationship_kwargs():
     assert default_kwargs() == default_relationship_kwargs()
 
+
 def test_kwarg_corrector_one_to_one_conflicts_one_to_many_kwargs_true():
-    
     kwargs = default_kwargs()
     kwargs['one_to_one']=True
     kwargs['one_to_many']=True
@@ -32,7 +31,6 @@ def test_kwarg_corrector_one_to_one_conflicts_one_to_many_kwargs_true():
     kwargs2['one_to_many']=True
     assert kwargs == kwargs2
 
-
 def test_kwargs_corrector_one_to_one_true():
     kwargs = default_kwargs()
     kwargs['one_to_one']=True
@@ -43,11 +41,6 @@ def test_warning():
     assert isinstance(msg, str)
     assert msg.count('{}') == 5
 
-def test_log_capture():
-    logger = logging.getLogger()
-    with LogCapture() as l:
-        logger.info('a message')
-        l.check( ('root', 'INFO', 'a message'),)
 
 def test_kwargs_corrector_one_to_one_and_uselist_true():
     one = 'uselist'
@@ -57,9 +50,14 @@ def test_kwargs_corrector_one_to_one_and_uselist_true():
     five = 'False'
     msg = warn(one, two, three, four, five)
 
-    kwargs = {}
+    kwargs = default_kwargs()
     kwargs['uselist'] = True
     kwargs['one_to_one'] = True
-    #l.check('root', 'WARNING', msg)
+    kwargs['lazy'] = 'select'
+
+    with LogCapture() as l:
+        kwarg_corrector(**kwargs)
+        l.check( ('root', 'WARNING', msg),)
+
 
 
