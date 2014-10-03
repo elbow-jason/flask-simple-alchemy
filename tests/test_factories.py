@@ -49,7 +49,6 @@ def test_foreign_key_func():
     assert fk2._colspec == 'rahul'
     assert fk2.onupdate == print_update
 
-
 def test_foreign_key_factory():
     fact = RelationshipFactories(db)
     FakeTableFKRelation = fact.foreign_key_factory('faketable')
@@ -57,15 +56,13 @@ def test_foreign_key_factory():
     assert isinstance(FakeTableFKRelation.faketable_id, db.Column)
     testInt = db.Integer()
     assert FakeTableFKRelation.faketable_id.type.__dict__ == testInt.__dict__
-
-
-
-
-
-
+    FakeTableFKRelation2 = fact.foreign_key_factory('faketable', 
+                                                    foreign_key='unique_name')
+    assert str(FakeTableFKRelation2.faketable_unique_name.foreign_keys)\
+        == "set([ForeignKey('faketable.unique_name')])"
+    assert str(FakeTableFKRelation2.faketable_unique_name.type)\
+        == 'INTEGER'
 def test_one_to_one_factory():
     #db = SQLAlchemy()
     fact = RelationshipFactories(db)
     FakeTableFKRelation = fact.foreign_key_factory('faketable')
-    
-    #TableFKRelation     = fact.foreign_key_factory('FakeTable')
