@@ -1,5 +1,5 @@
 from flask.ext.sqlalchemy import SQLAlchemy
-
+from sqlalchemy.ext.declarative import declared_attr
 
 class RelationshipFactories(object):
     """
@@ -38,24 +38,24 @@ class RelationshipFactories(object):
     def foreign_key_factory(self, tablename, foreign_key='id',
                             fk_type=None, **kwargs):
         if fk_type == None:
-            fk_type = db.Integer
+            fk_type = self.db.Integer
         table_and_fk = [tablename, foreign_key]
         #given 'person' and 'id' => person_id
         local_ref = '_'.join(table_and_fk)
         #given 'person' and 'id' => person.id
         remote_fk = '.'.join(table_and_fk)
 
-        def declare_id(name):
+        def declare_id():
             @declared_attr
             def func(cls):
-                return db.Column(fk_type, self.foreign_key(remote_fk))
+                return self.db.Column(fk_type, self.foreign_key(remote_fk))
             return func
         class ForeignKeyRelationship(object):
             pass
 
         setattr(ForeignKeyRelationship, 'table_of_fk', tablename)
         #setattr(ForeignKeyRelationship, 'foreign_key', foreign_key)
-        setattr(ForeignKeyRelationship, local_ref, declare_id(column_name))
+        setattr(ForeignKeyRelationship, local_ref, declare_id())
         return ForeignKeyRelationship
 
     def one_to_one_factory(self, table_class_name_reference,

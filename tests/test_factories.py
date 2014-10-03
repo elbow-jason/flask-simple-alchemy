@@ -2,9 +2,17 @@ from flask.ext.sqlalchemy import SQLAlchemy
 
 from flask_simple_alchemy import RelationshipFactories
 
+from sqlalchemy.ext.declarative import declared_attr
+
+db = SQLAlchemy()
+
+class FakeTable(db.Model):
+    id   = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+
 
 def test_RelationshipFactories_init():
-    db = SQLAlchemy()
+    #db = SQLAlchemy()
     try:
         fact = RelationshipFactories(db)
     except:
@@ -29,7 +37,7 @@ def test_RelationshipFactories_init_not_passed_SQLAlchemy_db_object():
     assert not errored
 
 def test_foreign_key_func():
-    db = SQLAlchemy()
+    #db = SQLAlchemy()
     fact = RelationshipFactories(db)
     fk = fact.foreign_key('jason')
     assert isinstance(fk, db.ForeignKey)
@@ -42,10 +50,18 @@ def test_foreign_key_func():
 
 
 def test_foreign_key_factory():
-    db = SQLAlchemy()
     fact = RelationshipFactories(db)
+    FakeTableFKRelation = fact.foreign_key_factory('faketable')
+    print FakeTableFKRelation.__dict__
+    assert isinstance(FakeTableFKRelation.faketable_id, db.Column)
+
+
 
 
 
 def test_one_to_one_factory():
-    pass
+    #db = SQLAlchemy()
+    fact = RelationshipFactories(db)
+    FakeTableFKRelation = fact.foreign_key_factory('faketable')
+    
+    #TableFKRelation     = fact.foreign_key_factory('FakeTable')
