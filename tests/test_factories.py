@@ -1,10 +1,16 @@
+from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
-from sqlalchemy.ext.declarative import declared_attr
+
+#from sqlalchemy.ext.declarative import declared_attr
 
 from flask_simple_alchemy import RelationshipFactories
 
+app = Flask(__name__)
+app.config.update(dict(SECRET_KEY="nonono",
+                       SQLALCHEMY_DATABASE_URI='sqlite:///faketest.db')
+                  )
 
-db = SQLAlchemy()
+db = SQLAlchemy(app)
 fact = RelationshipFactories(db)
 
 
@@ -37,7 +43,7 @@ def test_RelationshipFactories_init_not_passed_SQLAlchemy_db_object():
     not_db = BlankClass()
     errored = False
     try:
-        factr = RelationshipFactories(not_db)
+        RelationshipFactories(not_db)
         errored = True
     except:
         errored = False
@@ -82,4 +88,22 @@ def test_one_to_one_factory():
     FakeTableFK = fact.foreign_key_factory('faketable')
     FakeTableOneToOne = fact.one_to_one_factory('FakeTable', FakeTableFK)
     assert issubclass(FakeTableOneToOne, FakeTableFK)
+
+
+def test_ForeignKeyMixin():
+    FakeTableFK = fact.foreign_key_factory('faketable')
+    class AnotherFakeTable(db.Model, FakeTableFK):
+        __tablename__   = 'anotherfaketable'
+        id              = db.Column(db.Integer, primary_key=True)
+        unique_name     = db.Column(db.String, unique=True)
+
+    assert AnotherFakeTable.__dict__.has_key('faketable_id')
+    fk_obj = AnotherFakeTable.faketable_id
+    assert fk_obj
+
+def test_database_build():
+    db.drop_all()
+    db.create_all()
+
+
 

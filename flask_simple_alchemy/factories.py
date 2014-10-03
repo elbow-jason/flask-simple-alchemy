@@ -78,16 +78,16 @@ class RelationshipFactories(object):
                 return self.db.Column(fk_type, self.foreign_key(remote_fk))
             return func
 
-        class ForeignKeyRelationship(object):
+        class ForeignKeyMixin(object):
             pass
 
-        setattr(ForeignKeyRelationship, 'table_of_fk', tablename)
+        setattr(ForeignKeyMixin, 'table_of_fk', tablename)
         #setattr(ForeignKeyRelationship, 'foreign_key', foreign_key)
-        setattr(ForeignKeyRelationship, local_ref, declare_id())
-        return ForeignKeyRelationship
+        setattr(ForeignKeyMixin, local_ref, declare_id())
+        return ForeignKeyMixin
 
     def one_to_one_factory(self, table_class_name_reference,
-                           ForeignKeyRelClass):
+                           ForeignKeyMixinClass):
         """
         I am used to generate One-to-One relationship mixins
         """
@@ -99,7 +99,12 @@ class RelationshipFactories(object):
                                          uselist=False, lazy='select')
             return func
 
-        class OneToOneRelationship(ForeignKeyRelClass):
+        class OneToOneRelationship(ForeignKeyMixinClass):
+            """
+            I am the Mixin Class for OneToOne Relationships.
+            I inherit from ForeignKeyRelClass which is generated
+            returned by instances RelationshipFactories.foreign_key_factory.
+            """
             pass
 
         setattr(OneToOneRelationship,
