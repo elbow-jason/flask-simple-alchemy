@@ -11,8 +11,9 @@ class RelationshipFactories(object):
     def __init__(self, db):
         """
         I initialize the RelationshipFactories's instance.
-        I expect an instance of the SQLAlchemy object.
-        If I don't get a SQLAlchemy object I will throw an Exception.
+        I expect an instance of the SQLAlchemy object as my first 
+        argument. If I don't get a SQLAlchemy object as my first
+        argument I will throw an Exception.
 
         Constructor.
 
@@ -24,20 +25,26 @@ class RelationshipFactories(object):
                 requires/expects an instance of the SQLAlchemy object.')
         self.db = db
 
+    def foreign_key(self, name, **kwargs):
+        return self.db.ForeignKey(name, **kwargs)
 
+    def foreign_key_factory(self, column_name, foreign_key='id',
+                            nullable=True, fk_type=None,  **kwargs):
+        if fk_type == None:
+            fk_type = db.Integer
+        table_and_fk = [column_name, foreign_key]
+        #given 'person' and 'id' => person_id
+        local_ref = '_'.join(table_and_fk)
+        #given 'person' and 'id' => person.id
+        remote_fk = '.'.join(table_and_fk)
 
-    def id_num_relation_factory(self, column_name, **kwargs):
-        foreign_key  = kwargs.get('foreign_key', 'id')
-        nullable     = kwargs.get('nullable', False)
-        fk_data_type = kwargs.get('column_type', self.db.Integer)
-        fk           = '{}.{}'.format(column_name, foreign_key)
         def declare_id(name):
             @declared_attr
             def func(cls):
-                return db.Column(fk_data_type, db.ForeignKey(fk, nullable=nullable))
+                return db.Column(fk_type, self.foreign_key(remote_fk, nullable=nullable))
             return func
-        class Ider(object):
+        class ForeignKeyRelationship(object):
             pass
-        setattr(Ider, column_name + '_' + fk, declare_id(column_name))
-        return Ider
+        setattr(ForeignKeyRelationship, local_ref, declare_id(column_name))
+        return ForeignKeyRelationship
 
