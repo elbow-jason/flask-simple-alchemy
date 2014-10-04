@@ -46,11 +46,11 @@ class RelationshipFactories(object):
         return self.db.ForeignKey(name, **kwargs)
 
     def relationship(self, class_obj, table_class_name, one_to_one=False,
-                     one_to_many=False, uselist=None, lazy=None):
+                     many_to_one=False, uselist=None, lazy=None):
         """
         I return relationship objects.
         """
-        kwargs = dict(one_to_one=one_to_one, one_to_many=one_to_many,
+        kwargs = dict(one_to_one=one_to_one, many_to_one=many_to_one,
                       uselist=uselist, lazy=lazy)
 
         kwargs = kwarg_corrector(**kwargs)
@@ -129,7 +129,7 @@ class RelationshipFactories(object):
             """
             @declared_attr
             def func(cls):
-                return self.relationship(cls, table_class_name, lazy='select')
+                return self.relationship(cls, table_class_name, )
             return func
 
         class OneToManyRelationship(ForeignKeyMixinClass):

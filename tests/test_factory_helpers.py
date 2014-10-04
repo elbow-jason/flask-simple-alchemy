@@ -6,29 +6,32 @@ from testers import *
 
 
 def default_kwargs():
-    return {'uselist':True,
-            'lazy':'dynamic',
-            'one_to_one':False,
-            'one_to_many':False}
+    return {'uselist': True,
+            'lazy': 'dynamic',
+            'one_to_one': False,
+            'many_to_one': False}
+
 
 def test_default_relationship_kwargs():
     assert default_kwargs() == default_relationship_kwargs()
 
 
-def test_kwarg_corrector_one_to_one_conflicts_one_to_many_kwargs_true():
+def test_kwarg_corrector_one_to_one_conflicts_many_to_one_kwargs_true():
     kwargs = default_kwargs()
-    kwargs['one_to_one']=True
-    kwargs['one_to_many']=True
+    kwargs['one_to_one'] = True
+    kwargs['many_to_one'] = True
     try:
         kwarg_corrector(**kwargs)
     except Exception as e:
-        pass
+        print e
     else:
-        raise Exception('relationship_kwarg_corrector did not throw error when\n'+\
-            'presented with one_to_one=True and one_to_many=True')
+        raise Exception('relationship_kwarg_corrector did not throw'
+                        'error when\n presented with one_to_one=True'
+                        ' and many_to_one=True')
+
     kwargs2 = default_kwargs()
     kwargs2['one_to_one']=True
-    kwargs2['one_to_many']=True
+    kwargs2['many_to_one']=True
     assert kwargs == kwargs2
 
 def test_kwargs_corrector_one_to_one_true():

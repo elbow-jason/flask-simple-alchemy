@@ -110,5 +110,6 @@ def test_database_build():
     db.drop_all()
     db.create_all()
 
-
+def test_many_to_one_factory():
+    pass
 
