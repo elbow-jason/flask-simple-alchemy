@@ -97,8 +97,11 @@ class RelationshipFactories(object):
             """
             @declared_attr
             def func(cls):
-                return self.relationship(cls, table_class_name,
-                                         one_to_one=True)
+                x = self.db.relationship
+                y = x(table_class_name, uselist=False,
+                      backref=self.db.backref(cls.__tablename__,
+                                              lazy='select'))
+                return y
             return func
 
         class OneToOneRelationship(ForeignKeyMixinClass):
@@ -128,8 +131,10 @@ class RelationshipFactories(object):
             """
             @declared_attr
             def func(cls):
-                return self.relationship(cls, table_class_name,
-                                         many_to_one=True)
+                return self.db.relationship(table_class_name,
+                    backref=self.db.backref(cls.__tablename__, uselist=False,
+                                            lazy='select'), lazy='select'
+                                            )
             return func
 
         class OneToManyRelationship(ForeignKeyMixinClass):

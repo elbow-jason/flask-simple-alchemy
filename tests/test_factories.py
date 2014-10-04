@@ -128,4 +128,10 @@ def test_many_to_one_factory():
     FakeTableManyToOne = fact.many_to_one_factory('FakeTable', FakeTableFK)
     assert FakeTableManyToOne.faketable_id is not None
     assert 'faketable' in FakeTableManyToOne.__dict__
-    assert type(FakeTableManyToOne.faketable) is 'wee'
+
+    class AClassForTesting(db.Model, FakeTableManyToOne):
+        id = db.Column(db.Integer, primary_key=True)
+        __tablename__ = 'aclassfortesting'
+
+    assert AClassForTesting.__tablename__ == 'aclassfortesting'
+    assert 'InstrumentedAttribute' in str(type(AClassForTesting.faketable))
