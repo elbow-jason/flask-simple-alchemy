@@ -1,7 +1,7 @@
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 
-import sqlalchemy
+#import sqlalchemy
 #from sqlalchemy.ext.declarative import declared_attr
 
 from flask_simple_alchemy import RelationshipFactories
@@ -16,16 +16,16 @@ fact = RelationshipFactories(db)
 
 
 class FakeTable(db.Model):
-    __tablename__   = 'faketable'
-    id              = db.Column(db.Integer, primary_key=True)
-    unique_name     = db.Column(db.String, unique=True)
-    non_unique_col  = db.Column(db.String)
+    __tablename__ = 'faketable'
+    id = db.Column(db.Integer, primary_key=True)
+    unique_name = db.Column(db.String, unique=True)
+    non_unique_col = db.Column(db.String)
 
 
 class OtherTable(db.Model):
-    __tablename__   = 'othertable'
-    uuid            = db.Column(db.String, primary_key=True)
-    event_count     = db.Column(db.Integer)
+    __tablename__ = 'othertable'
+    uuid = db.Column(db.String, primary_key=True)
+    event_count = db.Column(db.Integer)
 
 
 def test_RelationshipFactories_init():
@@ -127,9 +127,9 @@ def test_ForeignKeyMixin():
     FakeTableFK = fact.foreign_key_factory('faketable')
 
     class AnotherFakeTable(db.Model, FakeTableFK):
-        __tablename__   = 'anotherfaketable'
-        id              = db.Column(db.Integer, primary_key=True)
-        unique_name     = db.Column(db.String, unique=True)
+        __tablename__ = 'anotherfaketable'
+        id = db.Column(db.Integer, primary_key=True)
+        unique_name = db.Column(db.String, unique=True)
 
     assert 'faketable_id' in AnotherFakeTable.__dict__
     fk_obj = AnotherFakeTable.faketable_id
@@ -142,13 +142,12 @@ def test_OneToOneMixin():
     FakeTableOneToOne = fact.one_to_one_factory('FakeTable', FakeTableFK)
 
     class YetAnotherFakeTable(db.Model, FakeTableOneToOne):
-        __tablename__   = 'yetanotherfaketable'
-        id              = db.Column(db.Integer, primary_key=True)
-        unique_name     = db.Column(db.String, unique=True)
+        __tablename__ = 'yetanotherfaketable'
+        id = db.Column(db.Integer, primary_key=True)
+        unique_name = db.Column(db.String, unique=True)
 
     db.drop_all()
     db.create_all()
-
 
     newb = YetAnotherFakeTable()
     newb.unique_name = 'yaft1'
@@ -161,10 +160,9 @@ def test_OneToOneMixin():
     db.session.add(new_fake)
     db.session.commit()
 
-    newb_saved = YetAnotherFakeTable.query.filter_by(unique_name='yaft1').first()
+    newby = YetAnotherFakeTable.query.filter_by(unique_name='yaft1').first()
     new_fake_saved = FakeTable.query.filter_by(unique_name='ft1').first()
-    newb_saved.faketable_id = new_fake_saved.id
-
+    newby.faketable_id = new_fake_saved.id
 
     assert YetAnotherFakeTable.faketable
     assert YetAnotherFakeTable
