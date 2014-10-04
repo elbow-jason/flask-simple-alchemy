@@ -104,20 +104,6 @@ def test_one_to_one_factory_foreign_key_as_second_arg():
     assert isinstance(OtherTableOneToOne.othertable_uuid, db.Column)
 
 
-def test_ForeignKeyMixin():
-    FakeTableFK = fact.foreign_key_factory('faketable')
-
-    class AnotherFakeTable(db.Model, FakeTableFK):
-        __tablename__   = 'anotherfaketable'
-        id              = db.Column(db.Integer, primary_key=True)
-        unique_name     = db.Column(db.String, unique=True)
-
-    assert 'faketable_id' in AnotherFakeTable.__dict__
-    fk_obj = AnotherFakeTable.faketable_id
-    assert fk_obj
-    assert "InstrumentedAttribute" in str(type(fk_obj))
-
-
 def test_database_build():
     db.drop_all()
     db.create_all()
@@ -135,3 +121,51 @@ def test_many_to_one_factory():
 
     assert AClassForTesting.__tablename__ == 'aclassfortesting'
     assert 'InstrumentedAttribute' in str(type(AClassForTesting.faketable))
+
+
+def test_ForeignKeyMixin():
+    FakeTableFK = fact.foreign_key_factory('faketable')
+
+    class AnotherFakeTable(db.Model, FakeTableFK):
+        __tablename__   = 'anotherfaketable'
+        id              = db.Column(db.Integer, primary_key=True)
+        unique_name     = db.Column(db.String, unique=True)
+
+    assert 'faketable_id' in AnotherFakeTable.__dict__
+    fk_obj = AnotherFakeTable.faketable_id
+    assert fk_obj
+    assert "InstrumentedAttribute" in str(type(fk_obj))
+
+
+def test_OneToOneMixin():
+    FakeTableFK = fact.foreign_key_factory('faketable')
+    FakeTableOneToOne = fact.one_to_one_factory('FakeTable', FakeTableFK)
+
+    class YetAnotherFakeTable(db.Model, FakeTableOneToOne):
+        __tablename__   = 'yetanotherfaketable'
+        id              = db.Column(db.Integer, primary_key=True)
+        unique_name     = db.Column(db.String, unique=True)
+
+    db.drop_all()
+    db.create_all()
+
+
+    newb = YetAnotherFakeTable()
+    newb.unique_name = 'yaft1'
+    db.session.add(newb)
+    db.session.commit()
+
+    new_fake = FakeTable()
+    new_fake.non_unique_col = 'wwooo'
+    new_fake.unique_name = 'ft1'
+    db.session.add(new_fake)
+    db.session.commit()
+
+    newb_saved = YetAnotherFakeTable.query.filter_by(unique_name='yaft1').first()
+    new_fake_saved = FakeTable.query.filter_by(unique_name='ft1').first()
+    newb_saved.faketable_id = new_fake_saved.id
+
+
+    assert YetAnotherFakeTable.faketable
+    assert YetAnotherFakeTable
+    db.drop_all()
