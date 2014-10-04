@@ -128,4 +128,4 @@ def test_many_to_one_factory():
     FakeTableManyToOne = fact.many_to_one_factory('FakeTable', FakeTableFK)
     assert FakeTableManyToOne.faketable_id is not None
     assert 'faketable' in FakeTableManyToOne.__dict__
-    assert FakeTableManyToOne.faketable_id is not None
+    assert type(FakeTableManyToOne.faketable) is 'wee'

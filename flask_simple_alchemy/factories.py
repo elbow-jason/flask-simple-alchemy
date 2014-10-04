@@ -104,10 +104,10 @@ class RelationshipFactories(object):
         class OneToOneRelationship(ForeignKeyMixinClass):
             """
             I am the Mixin Class for OneToOne Relationships.
-            I inherit from ForeignKeyRelClass which is generated
-            returned by instances RelationshipFactories.foreign_key_factory.
-            After leaving this factory I will have two '@declared_attr' 
-            methods: a foreign key and a relationship object.
+            I inherit from ForeignKeyRelClass\n which is generated
+            returned by instances RelationshipFactories.foreign_key_factory.\n
+            After leaving this factory I will have two '@declared_attr'
+            methods: a foreign key and a\n relationship object.
             """
             pass
 
@@ -117,9 +117,8 @@ class RelationshipFactories(object):
 
         return OneToOneRelationship
 
-
     def many_to_one_factory(self, table_class_name_reference,
-                           ForeignKeyMixinClass):
+                            ForeignKeyMixinClass):
         """
         I am used to generate One-to-One relationship mixins.
         """
@@ -129,7 +128,8 @@ class RelationshipFactories(object):
             """
             @declared_attr
             def func(cls):
-                return self.relationship(cls, table_class_name, )
+                return self.relationship(cls, table_class_name,
+                                         many_to_one=True)
             return func
 
         class OneToManyRelationship(ForeignKeyMixinClass):
@@ -137,7 +137,7 @@ class RelationshipFactories(object):
             I am the Mixin Class for OneToOne Relationships.
             I inherit from ForeignKeyRelClass which is generated
             returned by instances RelationshipFactories.foreign_key_factory.
-            After leaving this factory I will have two '@declared_attr' 
+            After leaving this factory I will have two '@declared_attr'
             methods: a foreign key and a relationship object.
             """
             pass
