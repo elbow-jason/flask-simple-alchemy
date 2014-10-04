@@ -82,14 +82,20 @@ def test_relationship_func():
     assert rel1to1
     assert type(rel1to1) is type(db.relationship('FakeTable'))
 
-def test_one_to_one_factory():
+def test_one_to_one_factory_default_foreign_key_as_id():
     #db = SQLAlchemy()
-    
     FakeTableFK = fact.foreign_key_factory('faketable')
     FakeTableOneToOne = fact.one_to_one_factory('FakeTable', FakeTableFK)
     assert issubclass(FakeTableOneToOne, FakeTableFK)
     assert FakeTableOneToOne.faketable_id is not None
     assert isinstance(FakeTableOneToOne.faketable_id, db.Column)
+
+def test_one_to_one_factory_foreign_key_as_second_arg():
+    OtherTableFK = fact.foreign_key_factory('othertable', 'uuid')
+    OtherTableOneToOne = fact.one_to_one_factory('OtherTable', OtherTableFK)
+    assert isinstance(OtherTableOneToOne.othertable_uuid, db.Column)
+
+
 
 def test_ForeignKeyMixin():
     FakeTableFK = fact.foreign_key_factory('faketable')
