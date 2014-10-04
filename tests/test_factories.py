@@ -95,8 +95,6 @@ def test_one_to_one_factory_foreign_key_as_second_arg():
     OtherTableOneToOne = fact.one_to_one_factory('OtherTable', OtherTableFK)
     assert isinstance(OtherTableOneToOne.othertable_uuid, db.Column)
 
-
-
 def test_ForeignKeyMixin():
     FakeTableFK = fact.foreign_key_factory('faketable')
     class AnotherFakeTable(db.Model, FakeTableFK):
