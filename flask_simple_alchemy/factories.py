@@ -7,7 +7,7 @@ which is used to generate Relationship Mixins.
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import declared_attr
 
-from factory_helpers import kwarg_corrector
+from flask_simple_alchemy.factory_helpers import kwarg_corrector
 
 
 class RelationshipFactories(object):
@@ -89,14 +89,16 @@ class RelationshipFactories(object):
     def one_to_one_factory(self, table_class_name_reference,
                            ForeignKeyMixinClass):
         """
-        I am used to generate One-to-One relationship mixins
+        I am used to generate One-to-One relationship mixins.
         """
         def declare_one_to_one(table_class_name):
+            """
 
+            """
             @declared_attr
             def func(cls):
                 return self.relationship(cls, table_class_name,
-                                         uselist=False, lazy='select')
+                                         one_to_one=True)
             return func
 
         class OneToOneRelationship(ForeignKeyMixinClass):
@@ -104,6 +106,8 @@ class RelationshipFactories(object):
             I am the Mixin Class for OneToOne Relationships.
             I inherit from ForeignKeyRelClass which is generated
             returned by instances RelationshipFactories.foreign_key_factory.
+            After leaving this factory I will have two '@declared_attr' 
+            methods: a foreign key and a relationship object.
             """
             pass
 
@@ -112,3 +116,34 @@ class RelationshipFactories(object):
                 declare_one_to_one(table_class_name_reference))
 
         return OneToOneRelationship
+
+
+    def many_to_one_factory(self, table_class_name_reference,
+                           ForeignKeyMixinClass):
+        """
+        I am used to generate One-to-One relationship mixins.
+        """
+        def declare_one_to_one(table_class_name):
+            """
+
+            """
+            @declared_attr
+            def func(cls):
+                return self.relationship(cls, table_class_name, lazy='select')
+            return func
+
+        class OneToManyRelationship(ForeignKeyMixinClass):
+            """
+            I am the Mixin Class for OneToOne Relationships.
+            I inherit from ForeignKeyRelClass which is generated
+            returned by instances RelationshipFactories.foreign_key_factory.
+            After leaving this factory I will have two '@declared_attr' 
+            methods: a foreign key and a relationship object.
+            """
+            pass
+
+        setattr(OneToManyRelationship,
+                OneToManyRelationship.table_of_fk,
+                declare_one_to_one(table_class_name_reference))
+
+        return OneToManyRelationship

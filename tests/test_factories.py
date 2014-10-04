@@ -88,7 +88,8 @@ def test_one_to_one_factory():
     FakeTableFK = fact.foreign_key_factory('faketable')
     FakeTableOneToOne = fact.one_to_one_factory('FakeTable', FakeTableFK)
     assert issubclass(FakeTableOneToOne, FakeTableFK)
-
+    assert FakeTableOneToOne.faketable_id is not None
+    assert isinstance(FakeTableOneToOne.faketable_id, db.Column)
 
 def test_ForeignKeyMixin():
     FakeTableFK = fact.foreign_key_factory('faketable')

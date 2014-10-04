@@ -18,7 +18,8 @@ setup(
     install_requires=[
         'Flask',
         'Flask-SQLAlchemy',
-        'pytest'
+        'pytest',
+        'testfixtures'
     ],
     test_suite='tests'
 )
