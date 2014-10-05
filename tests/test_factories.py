@@ -149,6 +149,52 @@ def test_OneToOneMixin():
     db.drop_all()
     db.create_all()
 
+    new_fake = FakeTable()
+    new_fake.non_unique_col = 'wwooo'
+    new_fake.unique_name = 'ft1'
+    db.session.add(new_fake)
+    db.session.commit()
+
+    ft1 = FakeTable.query.filter_by(unique_name='ft1').first()
+
+    yaft1 = YetAnotherFakeTable()
+    yaft1.unique_name = 'yaft1'
+    yaft1.faketable_id = ft1.id
+    db.session.add(yaft1)
+    db.session.commit()
+
+    ft1 = FakeTable.query.filter_by(unique_name='ft1').first()
+    yaft1 = YetAnotherFakeTable.query.filter_by(unique_name='yaft1').first()
+
+    assert YetAnotherFakeTable.faketable
+    assert YetAnotherFakeTable
+    assert yaft1.faketable == ft1
+    assert ft1.yetanotherfaketable[0] == yaft1
+
+    yaft2 = YetAnotherFakeTable()
+    yaft2.unique_name = 'yaft2'
+    yaft2.faketable_id = ft1.id
+    db.session.add(yaft2)
+    db.session.commit()
+
+    assert ft1.yetanotherfaketable[0] == yaft1
+    assert ft1.yetanotherfaketable[1] == yaft2
+
+    db.drop_all()
+
+"""
+def test_ManyToOneMixin():
+    FakeTableFK = fact.foreign_key_factory('faketable')
+    FakeTableManyToOne = fact.many_to_one_factory('FakeTable', FakeTableFK)
+
+    class YetAnotherFakeTable(db.Model, FakeTableOneToOne):
+        __tablename__ = 'yetanotherfaketable'
+        id = db.Column(db.Integer, primary_key=True)
+        unique_name = db.Column(db.String, unique=True)
+
+    db.drop_all()
+    db.create_all()
+
     newb = YetAnotherFakeTable()
     newb.unique_name = 'yaft1'
     db.session.add(newb)
@@ -167,3 +213,4 @@ def test_OneToOneMixin():
     assert YetAnotherFakeTable.faketable
     assert YetAnotherFakeTable
     db.drop_all()
+"""
