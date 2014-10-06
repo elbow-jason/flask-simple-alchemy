@@ -20,7 +20,7 @@ def test_Relator_setattrs():
     assert this_table.HasManyToOneWith.OtherTable
 
 
-def test_Realtor_relationships():
+def test_Realtor_relationship():
     this_table = Relator(db)
     this_table.add('FakeTable')
     this_table.add('OtherTable', foreign_key='uuid')
@@ -31,6 +31,19 @@ def test_Realtor_relationships():
 
     assert ThirdTable.faketable_id
     assert ThirdTable.faketable
+
+
+def test_Realtor_relationship_again():
+    this_table = Relator(db)
+    this_table.add('FakeTable')
+    this_table.add('OtherTable', foreign_key='uuid')
+
+    class FourthTable(db.Model, this_table.HasManyToOneWith.OtherTable):
+        __tablename__ = 'foruthtable'
+        id = db.Column(db.Integer, primary_key=True)
+
+    assert FourthTable.othertable_uuid
+    assert FourthTable.othertable
 
 
 def test_database_creation():
