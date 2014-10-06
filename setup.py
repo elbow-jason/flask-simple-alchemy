@@ -4,7 +4,7 @@ project = "flask-simple-alchemy"
 
 setup(
     name=project,
-    version='0.2.1',  # Alpha Release
+    version='0.2.2',  # Alpha Release
     url='https://github.com/jlgoldb2/flask-simple-alchemy',
     description='A Simplification of SQLAlchemy\'s declarative using'
                 ' Flask-SQLAlchemy',

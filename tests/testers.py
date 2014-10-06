@@ -78,5 +78,6 @@ class FakeTable(db.Model):
 
 class OtherTable(db.Model):
     __tablename__ = 'othertable'
-    uuid = db.Column(db.String, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String, unique=True)
     event_count = db.Column(db.Integer)

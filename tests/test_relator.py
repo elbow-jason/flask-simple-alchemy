@@ -36,14 +36,35 @@ def test_Realtor_relationship():
 def test_Realtor_relationship_again():
     this_table = Relator(db)
     this_table.add('FakeTable')
-    this_table.add('OtherTable', foreign_key='uuid')
+    this_table.add('OtherTable', foreign_key='uuid', relation_name='OtherTableUUID1')
 
-    class FourthTable(db.Model, this_table.HasManyToOneWith.OtherTable):
-        __tablename__ = 'foruthtable'
+    class FourthTable(db.Model, this_table.HasManyToOneWith.OtherTableUUID1):
+        __tablename__ = 'fourthtable'
         id = db.Column(db.Integer, primary_key=True)
 
     assert FourthTable.othertable_uuid
     assert FourthTable.othertable
+
+def test_Realtor_relation_name():
+    this_table = Relator(db)
+    this_table.add('FakeTable')
+    this_table.add('OtherTable')
+    this_table.add('OtherTable', foreign_key='uuid', relation_name="OtherTableUUID")
+
+    class SixthTable(db.Model, this_table.HasManyToOneWith.OtherTable):
+        __tablename__ = 'sixthtable'
+        id = db.Column(db.Integer, primary_key=True)
+
+    class FifthTable(db.Model, this_table.HasManyToOneWith.OtherTableUUID):
+        __tablename__ = 'fifthtable'
+        id = db.Column(db.Integer, primary_key=True)
+    
+
+    assert SixthTable.othertable_id
+    assert SixthTable.othertable
+
+    assert FifthTable.othertable_uuid
+    assert FifthTable.othertable
 
 
 def test_database_creation():
@@ -58,3 +79,4 @@ def test_database_creation():
     db.drop_all()
     db.create_all()
     db.drop_all()
+
