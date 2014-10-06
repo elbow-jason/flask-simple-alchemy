@@ -33,8 +33,10 @@ class HasForeignKeyOf(object):
         self.db = db
         self.factory = factory_instance
 
-    def add(self, class_name, relation_name, fk='id'):
-        setattr(self, relation_name, self.factory.foreign_key_factory(class_name.lower(), fk))
+    def add(self, class_name, relation_name, fk='id', fk_type=None):
+        if fk_type is None:
+            fk_type = self.db.Integer()
+        setattr(self, relation_name, self.factory.foreign_key_factory(class_name.lower(), fk, fk_type=fk_type))
 
     def get(self, method_name):
         return self.__dict__[method_name]
@@ -47,10 +49,12 @@ class Relator(object):
         self.HasOneToOneWith    = HasOneToOneWith(db, self.factories)
         self.HasManyToOneWith   = HasManyToOneWith(db, self.factories)
 
-    def add(self, table_class_name, foreign_key='id', relation_name=None):
+    def add(self, table_class_name, foreign_key='id', relation_name=None, fk_type=None):
         if relation_name is None:
             relation_name = table_class_name
+        if fk_type is None:
+            fk_type = self.db.Integer()
 
-        self.HasForeignKeyOf.add(table_class_name,  relation_name, fk=foreign_key)
+        self.HasForeignKeyOf.add(table_class_name,  relation_name, fk=foreign_key, fk_type=fk_type)
         self.HasOneToOneWith.add(table_class_name,  relation_name,  self.HasForeignKeyOf.get(relation_name))
         self.HasManyToOneWith.add(table_class_name, relation_name, self.HasForeignKeyOf.get(relation_name))
