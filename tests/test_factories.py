@@ -1,32 +1,9 @@
-from flask import Flask
-from flask.ext.sqlalchemy import SQLAlchemy
 
 #import sqlalchemy
 #from sqlalchemy.ext.declarative import declared_attr
 
 from flask_simple_alchemy import RelationshipFactories
-
-app = Flask(__name__)
-app.config.update(dict(SECRET_KEY="nonono",
-                       SQLALCHEMY_DATABASE_URI='sqlite:///faketest.db')
-                  )
-
-db = SQLAlchemy(app)
-fact = RelationshipFactories(db)
-
-
-class FakeTable(db.Model):
-    __tablename__ = 'faketable'
-    id = db.Column(db.Integer, primary_key=True)
-    unique_name = db.Column(db.String, unique=True)
-    non_unique_col = db.Column(db.String)
-
-
-class OtherTable(db.Model):
-    __tablename__ = 'othertable'
-    uuid = db.Column(db.String, primary_key=True)
-    event_count = db.Column(db.Integer)
-
+from testers import *
 
 def test_RelationshipFactories_init():
     #db = SQLAlchemy()

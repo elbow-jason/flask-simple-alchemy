@@ -1,6 +1,19 @@
 from testfixtures import LogCapture, log_capture
 import logging
 
+from flask import Flask
+from flask.ext.sqlalchemy import SQLAlchemy
+from flask_simple_alchemy import RelationshipFactories
+
+app = Flask(__name__)
+app.config.update(dict(SECRET_KEY="nonono",
+                       SQLALCHEMY_DATABASE_URI='sqlite:///faketest.db')
+                  )
+
+db = SQLAlchemy(app)
+fact = RelationshipFactories(db)
+
+
 
 def capture(messenger, msg, level='DEBUG'):
     with LogCapture() as l:
@@ -53,3 +66,17 @@ def capture_any_log(messenger, msg):
 
 def capture_warning(messenger, msg):
     capture(messenger, msg, level='WARNING')
+
+
+
+class FakeTable(db.Model):
+    __tablename__ = 'faketable'
+    id = db.Column(db.Integer, primary_key=True)
+    unique_name = db.Column(db.String, unique=True)
+    non_unique_col = db.Column(db.String)
+
+
+class OtherTable(db.Model):
+    __tablename__ = 'othertable'
+    uuid = db.Column(db.String, primary_key=True)
+    event_count = db.Column(db.Integer)
