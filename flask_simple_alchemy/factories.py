@@ -153,8 +153,8 @@ class RelationshipFactories(object):
         return OneToManyRelationship
 
 
-
-def simple_table_factory(db, default_primary_key='id', default_pk_type='integer'):
+def simple_table_factory(db, default_primary_key='id',
+                         default_pk_type='integer'):
     """
     I am a factory that produces a class Mixin that provides:
     1) default 'id' primary_key columns
@@ -173,13 +173,13 @@ def simple_table_factory(db, default_primary_key='id', default_pk_type='integer'
             i.e. given the arg 'integer', I return the db.Integer function.
         """
         types = {
-            'string' : db.String,
-            'integer': db.Integer
-            }
+                'string':  db.String,
+                'integer': db.Integer
+                }
         try:
             return types[str(typename)]
         except:
-            raise Exception( str(typename) + ' was not a valid type')
+            raise Exception(str(typename) + ' was not a valid type')
 
 
     def simple_setter(class_object, column_typename):
@@ -208,7 +208,9 @@ def simple_table_factory(db, default_primary_key='id', default_pk_type='integer'
         """
 
     if default_primary_key:
-        setattr(SimpleTable, default_primary_key, db.Column(get_type(default_pk_type)))
+        setattr(SimpleTable, default_primary_key,
+                db.Column(get_type(default_pk_type), primary_key=True))
+
     SimpleTable.strings = property(simple_getter('string'), simple_setter(SimpleTable, 'string'))
     SimpleTable.strings = property(simple_getter('integer'), simple_setter(SimpleTable, 'integer'))
 
