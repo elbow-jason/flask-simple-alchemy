@@ -49,16 +49,13 @@ class Computer(db.Model, this_table.HasManyToOneWith.Person):
     name = db.Column(db.String, unique=True)
     vendor = db.Column(db.String)
     purchase_time = db.Column(db.DateTime)
-    #owner_id = db.Column(db.Integer, db.ForeignKey('person.id'))
-    #owner = db.relationship('Person', backref=db.backref('computers',
-    #                                                     lazy='dynamic'))
 
 
 class Cat(db.Model, this_table.HasOneToOneWith.Person):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True)
     age = db.Column(db.Integer)
-
+    message = db.Column(db.String)
 
 def reset_db():
     db.drop_all()
@@ -73,49 +70,51 @@ def add_api_endpoints():
 
 
 def seed_db():
-    p = Person()
-    p.name = u"Jason"
-    p.birth_date = date.today()
+    try:
+        p = Person()
+        p.name = u"Jason"
+        p.birth_date = date.today()
+        db.session.add(p)
+        db.session.commit()
 
-    nc = Computer()
-    nc.name = "elbow"
-    nc.vendor = "ASUS"
-    nc.purchase_time = datetime.utcnow()
-    nc.person = p
+        computer1 = Computer()
+        computer1.name = "elbow"
+        computer1.vendor = "ASUS"
+        computer1.purchase_time = datetime.utcnow()
+        computer1.person = p
+        db.session.add(computer1)
+        db.session.commit()
 
+        computer2 = Computer()
+        computer2.name = "jasons-desktop"
+        computer2.vendor = "self-built"
+        computer2.purchase_time = datetime.utcnow()
+        computer2.person = p
+        db.session.add(computer2)
+        db.session.commit()
 
-    anc = Computer()
-    anc.name = "comp1"
-    anc.vendor = "ASUS"
-    anc.purchase_time = datetime.utcnow()
-    anc.person = p
+        cat1 = Cat()
+        cat1.name = "Ruby"
+        cat1.age = 0
+        cat1.person = p
+        cat1.message = "Ruby will be clobbered by wildman for the database"+\
+            " Person.cat relationship since it is a one_to_one"
+        db.session.add(cat1)
+        db.session.commit()
 
+        cat2 = Cat()
+        cat2.name = "Wildman"
+        cat2.age = 0
+        cat2.message = "Notice that there is no 'Ruby' cat. She was"+\
+            " clobbered when Wildman was committed. Notice also that"+\
+            " Person.cat is a single dict/json object not a list/array."
+        cat2.person = p
+        db.session.add(cat2)
+        db.session.commit()
 
-    cat = Cat()
-    cat.name = "Ruby"
-    cat.age = 0
-    cat.person = p
-
-
-    cat2 = Cat()
-    cat2.name = "Wildman"
-    cat2.age = 0
-    cat2.person = p
-
-
-    db.session.add(p)
-    db.session.add(nc)
-    #db.session.add(anc)
-    db.session.add(cat)
-    #db.session.add(cat2)
-    db.session.commit()
-
-    sp = Person.query.first()
-    sc = Computer.query.first()
-
-    print sp.__dict__.keys()
-    print sc.__dict__.keys()
-
+    except Exception as e:
+        db.session.rollback()
+        raise e
 
 if __name__ == '__main__':
     reset_db()
