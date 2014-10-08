@@ -27,7 +27,8 @@ class RelationshipFactories(object):
         Constructor.
 
             :param db:
-                Flask-SQLAlchemy database object
+                Flask-SQLAlchemy database object. Instance of
+                flask.ext.sqlalchemy.SQLAlchemy()
         """
         if not isinstance(db, SQLAlchemy):
             raise Exception('The RelationshipFactories object\
@@ -97,11 +98,9 @@ class RelationshipFactories(object):
             """
             @declared_attr
             def func(cls):
-                x = self.db.relationship
-                y = x(table_class_name, uselist=False,
+                return self.db.relationship(table_class_name,
                       backref=self.db.backref(cls.__tablename__,
-                                              lazy='select'))
-                return y
+                                uselist=False, lazy='select'), )
             return func
 
         class OneToOneRelationship(ForeignKeyMixinClass):
@@ -132,8 +131,8 @@ class RelationshipFactories(object):
             @declared_attr
             def func(cls):
                 return self.db.relationship(table_class_name,
-                    backref=self.db.backref(cls.__tablename__, uselist=False,
-                                            lazy='select'), lazy='select'
+                    backref=self.db.backref(cls.__tablename__,
+                                            lazy='dynamic'), lazy='select'
                                             )
             return func
 

@@ -56,5 +56,5 @@ class Relator(object):
             fk_type = self.db.Integer()
 
         self.HasForeignKeyOf.add(table_class_name,  relation_name, fk=foreign_key, fk_type=fk_type)
-        self.HasOneToOneWith.add(table_class_name,  relation_name,  self.HasForeignKeyOf.get(relation_name))
+        self.HasOneToOneWith.add(table_class_name,  relation_name, self.HasForeignKeyOf.get(relation_name))
         self.HasManyToOneWith.add(table_class_name, relation_name, self.HasForeignKeyOf.get(relation_name))

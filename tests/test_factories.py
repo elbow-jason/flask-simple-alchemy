@@ -5,6 +5,36 @@
 from flask_simple_alchemy import RelationshipFactories
 from testers import *
 
+
+FakeTableFK = fact.foreign_key_factory('faketable')
+FakeTableOneToOne = fact.one_to_one_factory('FakeTable', FakeTableFK)
+FakeTableManyToOne = fact.many_to_one_factory('FakeTable', FakeTableFK)
+
+
+
+class YetAnotherFakeTable(db.Model, FakeTableOneToOne):
+    __tablename__ = 'yetanotherfaketable'
+    id = db.Column(db.Integer, primary_key=True)
+    unique_name = db.Column(db.String, unique=True)
+
+
+class AClassForTesting(db.Model, FakeTableManyToOne):
+    id = db.Column(db.Integer, primary_key=True)
+    __tablename__ = 'aclassfortesting'
+
+
+class YetAnotherFakeTableAgain(db.Model, FakeTableManyToOne):
+    __tablename__ = 'yetanotherfaketableagain'
+    id = db.Column(db.Integer, primary_key=True)
+    unique_name = db.Column(db.String, unique=True)
+
+
+class AnotherFakeTable(db.Model, FakeTableFK):
+    __tablename__ = 'anotherfaketable'
+    id = db.Column(db.Integer, primary_key=True)
+    unique_name = db.Column(db.String, unique=True)
+
+
 def test_RelationshipFactories_init():
     #db = SQLAlchemy()
     try:
@@ -46,16 +76,15 @@ def test_foreign_key_func():
 
 def test_foreign_key_factory():
     #fact = RelationshipFactories(db)
-    FakeTableFKRelation = fact.foreign_key_factory('faketable')
-    print FakeTableFKRelation.faketable_id.__dict__
-    assert isinstance(FakeTableFKRelation.faketable_id, db.Column)
+    print FakeTableFK.faketable_id.__dict__
+    assert isinstance(FakeTableFK.faketable_id, db.Column)
     testInt = db.Integer()
-    assert FakeTableFKRelation.faketable_id.type.__dict__ == testInt.__dict__
-    FakeTableFKRelation2 = fact.foreign_key_factory('faketable',
+    assert FakeTableFK.faketable_id.type.__dict__ == testInt.__dict__
+    FakeTableFK2 = fact.foreign_key_factory('faketable',
                                                     foreign_key='unique_name')
-    assert str(FakeTableFKRelation2.faketable_unique_name.foreign_keys)\
+    assert str(FakeTableFK2.faketable_unique_name.foreign_keys)\
         == "set([ForeignKey('faketable.unique_name')])"
-    assert str(FakeTableFKRelation2.faketable_unique_name.type)\
+    assert str(FakeTableFK2.faketable_unique_name.type)\
         == 'INTEGER'
 
 
@@ -87,26 +116,21 @@ def test_database_build():
 
 
 def test_many_to_one_factory():
-    FakeTableFK = fact.foreign_key_factory('faketable')
-    FakeTableManyToOne = fact.many_to_one_factory('FakeTable', FakeTableFK)
     assert FakeTableManyToOne.faketable_id is not None
     assert 'faketable' in FakeTableManyToOne.__dict__
 
-    class AClassForTesting(db.Model, FakeTableManyToOne):
-        id = db.Column(db.Integer, primary_key=True)
-        __tablename__ = 'aclassfortesting'
-
     assert AClassForTesting.__tablename__ == 'aclassfortesting'
     assert 'InstrumentedAttribute' in str(type(AClassForTesting.faketable))
+
+    aclass = AClassForTesting()
+    db.session.add(aclass)
+    db.session.commit()
 
 
 def test_ForeignKeyMixin():
     FakeTableFK = fact.foreign_key_factory('faketable')
 
-    class AnotherFakeTable(db.Model, FakeTableFK):
-        __tablename__ = 'anotherfaketable'
-        id = db.Column(db.Integer, primary_key=True)
-        unique_name = db.Column(db.String, unique=True)
+
 
     assert 'faketable_id' in AnotherFakeTable.__dict__
     fk_obj = AnotherFakeTable.faketable_id
@@ -115,13 +139,6 @@ def test_ForeignKeyMixin():
 
 
 def test_OneToOneMixin():
-    FakeTableFK = fact.foreign_key_factory('faketable')
-    FakeTableOneToOne = fact.one_to_one_factory('FakeTable', FakeTableFK)
-
-    class YetAnotherFakeTable(db.Model, FakeTableOneToOne):
-        __tablename__ = 'yetanotherfaketable'
-        id = db.Column(db.Integer, primary_key=True)
-        unique_name = db.Column(db.String, unique=True)
 
     db.drop_all()
     db.create_all()
@@ -146,7 +163,7 @@ def test_OneToOneMixin():
     assert YetAnotherFakeTable.faketable
     assert YetAnotherFakeTable
     assert yaft1.faketable == ft1
-    assert ft1.yetanotherfaketable[0] == yaft1
+    assert ft1.yetanotherfaketable == yaft1
 
     yaft2 = YetAnotherFakeTable()
     yaft2.unique_name = 'yaft2'
@@ -154,40 +171,61 @@ def test_OneToOneMixin():
     db.session.add(yaft2)
     db.session.commit()
 
-    assert ft1.yetanotherfaketable[0] == yaft1
-    assert ft1.yetanotherfaketable[1] == yaft2
+    assert ft1.yetanotherfaketable == yaft1
+
+    #assert ft1.yetanotherfaketable[1] == yaft2
 
     db.drop_all()
 
-"""
+
 def test_ManyToOneMixin():
     FakeTableFK = fact.foreign_key_factory('faketable')
     FakeTableManyToOne = fact.many_to_one_factory('FakeTable', FakeTableFK)
 
-    class YetAnotherFakeTable(db.Model, FakeTableOneToOne):
-        __tablename__ = 'yetanotherfaketable'
-        id = db.Column(db.Integer, primary_key=True)
-        unique_name = db.Column(db.String, unique=True)
-
     db.drop_all()
     db.create_all()
 
-    newb = YetAnotherFakeTable()
-    newb.unique_name = 'yaft1'
-    db.session.add(newb)
-    db.session.commit()
+    assert YetAnotherFakeTableAgain
+    assert YetAnotherFakeTableAgain.faketable
 
     new_fake = FakeTable()
     new_fake.non_unique_col = 'wwooo'
     new_fake.unique_name = 'ft1'
     db.session.add(new_fake)
     db.session.commit()
-
-    newby = YetAnotherFakeTable.query.filter_by(unique_name='yaft1').first()
     new_fake_saved = FakeTable.query.filter_by(unique_name='ft1').first()
-    newby.faketable_id = new_fake_saved.id
 
-    assert YetAnotherFakeTable.faketable
-    assert YetAnotherFakeTable
-    db.drop_all()
-"""
+    assert new_fake_saved
+
+    newb1 = YetAnotherFakeTableAgain()
+    newb1.unique_name = 'yafta1'
+    newb1.faketable_id = new_fake_saved.id
+    db.session.add(newb1)
+    db.session.commit()
+
+    newb2 = YetAnotherFakeTableAgain()
+    newb2.unique_name = 'yafta2'
+    newb2.faketable_id = new_fake_saved.id
+    db.session.add(newb2)
+    db.session.commit()
+
+    count = YetAnotherFakeTableAgain.query.count()
+    assert count == 2
+
+    all_yafta = YetAnotherFakeTableAgain.query.all()
+    assert len(all_yafta) == 2
+    assert all_yafta[0].unique_name == 'yafta1'
+    assert all_yafta[0].faketable_id == 1
+    assert all_yafta[1].unique_name == 'yafta2'
+    assert all_yafta[1].faketable_id == 1
+
+    reloaded_fake_saved = FakeTable.query.filter_by(unique_name='ft1').first()
+    yafta1 = reloaded_fake_saved.yetanotherfaketableagain[0]
+    yafta2 = reloaded_fake_saved.yetanotherfaketableagain[1]
+
+    assert yafta1.unique_name == 'yafta1'
+    assert yafta2.unique_name == 'yafta2'
+
+    #assert one
+    #assert two
+
