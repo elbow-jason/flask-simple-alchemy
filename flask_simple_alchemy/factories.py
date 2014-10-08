@@ -151,3 +151,65 @@ class RelationshipFactories(object):
                 declare_one_to_one(table_class_name_reference))
 
         return OneToManyRelationship
+
+
+
+def simple_table_factory(db, default_primary_key='id', default_pk_type='integer'):
+    """
+    I am a factory that produces a class Mixin that provides:
+    1) default 'id' primary_key columns
+        change primary key attribute and type via:
+            default_primary_key='some_stringy_key'
+            default_pk_type='string'
+    2) and table attributes/columns in easy-to-use lists
+    """
+
+    def get_type(typename):
+        """
+        I am the get_type function.
+        I am a function that returns SQLAlchemy column data types given
+        a stringy representation of that type.
+            i.e. given the arg 'string', I return the db.String function.
+            i.e. given the arg 'integer', I return the db.Integer function.
+        """
+        types = {
+            'string' : db.String,
+            'integer': db.Integer
+            }
+        try:
+            return types[str(typename)]
+        except:
+            raise Exception( str(typename) + ' was not a valid type')
+
+
+    def simple_setter(class_object, column_typename):
+        """
+        """
+        def set_type(self, value):
+            for item in value:
+                setattr(class_object,
+                        item,
+                        db.Column(get_type(column_typename)))
+                setattr(self, '_' + column_typename, value)
+        return set_type
+
+    def simple_getter(column_typename):
+        def get_type(self):
+                return getattr(self, '_' + column_typename)
+        return get_type
+
+
+    class SimpleTable(object):
+
+        """
+        I am SimpleTable. I am a Mixin that provides:
+            1) an integer primary key 'id'
+            2) the ability to define SQLAlchemy columns via iterable lists.
+        """
+
+    if default_primary_key:
+        setattr(SimpleTable, default_primary_key, db.Column(get_type(default_pk_type)))
+    SimpleTable.strings = property(simple_getter('string'), simple_setter(SimpleTable, 'string'))
+    SimpleTable.strings = property(simple_getter('integer'), simple_setter(SimpleTable, 'integer'))
+
+    return SimpleTable

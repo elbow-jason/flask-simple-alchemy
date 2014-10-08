@@ -2,7 +2,7 @@
 #import sqlalchemy
 #from sqlalchemy.ext.declarative import declared_attr
 
-from flask_simple_alchemy import RelationshipFactories
+from flask_simple_alchemy import RelationshipFactories, simple_table_factory
 from testers import *
 
 
@@ -229,3 +229,5 @@ def test_ManyToOneMixin():
     #assert one
     #assert two
 
+def test_simple_table_factory():
+    pass
