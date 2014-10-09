@@ -4,7 +4,8 @@ flask_simple_alchemy folder. I contain the RelationshipFactories class
 which is used to generate Relationship Mixins.
 """
 
-from flask.ext.sqlalchemy import SQLAlchemy
+import sqlalchemy
+from flask.ext.sqlalchemy import SQLAlchemy, _BoundDeclarativeMeta
 from sqlalchemy.ext.declarative import declared_attr
 
 from flask_simple_alchemy.factory_helpers import kwarg_corrector
@@ -153,7 +154,7 @@ class RelationshipFactories(object):
         return OneToManyRelationship
 
 
-from flask.ext.sqlalchemy import _BoundDeclarativeMeta
+
 
 def simple_table_factory(db, default_primary_key='id',
                          default_pk_type='integer'):
@@ -165,8 +166,28 @@ def simple_table_factory(db, default_primary_key='id',
             default_pk_type='string'
     2) and table attributes/columns in easy-to-use lists
     """
+    def get_sqltypes_from_db():
+        """
+        I am get_sqltypes. I use an extremely long, nested list comprehension
+        to extract all the sqltypes from the db (instance of SQLAlchemy) obj.
+        Using the resulting list, I generate a dict of lowercase keys and
+        sqltype object values returned.
+        """
+        types = {}
 
-    def get_type(typename):
+        sqltypes = [sqltype for sqltype in
+            [obj for name, obj in db.__dict__.items()
+            if getattr(obj, '__mro__', None) is not None]
+            if sqlalchemy.sql.type_api.TypeEngine in sqltype.mro()]
+
+        for obj in sqltypes:
+            name = obj.__name__.lower()
+            types[name] = obj
+        return types
+
+    sqltypes = get_sqltypes_from_db()
+
+    def get_sqltype(typename):
         """
         I am the get_type function.
         I am a function that returns SQLAlchemy column data types given
@@ -174,23 +195,23 @@ def simple_table_factory(db, default_primary_key='id',
             i.e. given the arg 'string', I return the db.String function.
             i.e. given the arg 'integer', I return the db.Integer function.
         """
-        types = {
-                'string':  db.String,
-                'integer': db.Integer
-                }
         try:
-            return types[str(typename)]
+            return sqltypes[str(typename)]
         except:
             raise Exception(str(typename) + ' was not a valid type')
 
+
     def simple_setter(class_object, column_typename):
         """
+        I am a function that returns a setter function. The setter function
+        that I return iterates a list of strings and sets those attributes
+        as the appropriate datatype.
         """
         def set_type(self, value):
             for item in value:
                 setattr(class_object,
                         item,
-                        db.Column(get_type(column_typename)))
+                        db.Column(get_sqltype(column_typename)))
                 setattr(self, '_' + column_typename, value)
         return set_type
 
@@ -199,18 +220,18 @@ def simple_table_factory(db, default_primary_key='id',
                 return getattr(self, '_' + column_typename)
         return get_type
 
+    def metaclass_factory():
+        class SomeMetaClass(type):
+            pass
+        return SomeMetaClass
 
-    class SimpleMetaClass(type):
-        pass
+    SimpleMetaClass = metaclass_factory()
 
-    setattr(SimpleMetaClass, 'strings',
-            property(simple_getter('string'),
-                     simple_setter(SimpleMetaClass, 'string')))
 
-    setattr(SimpleMetaClass, 'integers',
-            property(simple_getter('integer'),
-                     simple_setter(SimpleMetaClass, 'integer')))
-
+    for k, v in sqltypes.items():
+        setattr(SimpleMetaClass, k + 's',
+                property(simple_getter(k),
+                         simple_setter(SimpleMetaClass, k)))
 
 
     class DoubleMetaClass(SimpleMetaClass, _BoundDeclarativeMeta):
@@ -229,7 +250,7 @@ def simple_table_factory(db, default_primary_key='id',
 
     if default_primary_key:
         setattr(SimpleTable, default_primary_key,
-                db.Column(get_type(default_pk_type), primary_key=True))
+                db.Column(get_sqltype(default_pk_type), primary_key=True))
 
 
     return SimpleTable
