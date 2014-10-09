@@ -153,6 +153,8 @@ class RelationshipFactories(object):
         return OneToManyRelationship
 
 
+from flask.ext.sqlalchemy import _BoundDeclarativeMeta
+
 def simple_table_factory(db, default_primary_key='id',
                          default_pk_type='integer'):
     """
@@ -181,7 +183,6 @@ def simple_table_factory(db, default_primary_key='id',
         except:
             raise Exception(str(typename) + ' was not a valid type')
 
-
     def simple_setter(class_object, column_typename):
         """
         """
@@ -199,19 +200,36 @@ def simple_table_factory(db, default_primary_key='id',
         return get_type
 
 
-    class SimpleTable(object):
+    class SimpleMetaClass(type):
+        pass
 
+    setattr(SimpleMetaClass, 'strings',
+            property(simple_getter('string'),
+                     simple_setter(SimpleMetaClass, 'string')))
+
+    setattr(SimpleMetaClass, 'integers',
+            property(simple_getter('integer'),
+                     simple_setter(SimpleMetaClass, 'integer')))
+
+
+
+    class DoubleMetaClass(SimpleMetaClass, _BoundDeclarativeMeta):
+        pass
+
+    class SimpleTable(object):
         """
         I am SimpleTable. I am a Mixin that provides:
             1) an integer primary key 'id'
             2) the ability to define SQLAlchemy columns via iterable lists.
         """
+        _decl_class_registry = []
+        __metaclass__ = DoubleMetaClass
+        __abstract__= True
+
 
     if default_primary_key:
         setattr(SimpleTable, default_primary_key,
                 db.Column(get_type(default_pk_type), primary_key=True))
 
-    SimpleTable.strings = property(simple_getter('string'), simple_setter(SimpleTable, 'string'))
-    SimpleTable.strings = property(simple_getter('integer'), simple_setter(SimpleTable, 'integer'))
 
     return SimpleTable

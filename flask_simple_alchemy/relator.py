@@ -50,7 +50,26 @@ class HasForeignKeyOf(object):
         return self.__dict__[method_name]
 
 
+
+
+class SimpleTableMetaClass(type):
+    @property
+    def IsASimpleTable(self):
+        self._IsASimpleTable
+        SimpleTable = simple_table_factory(db)
+        SimpleTable._decl_class_registry = db.Model._decl_class_registry
+        return SimpleTable
+
+    @IsASimpleTable.setter
+    def IsASimpleTable(self, value):
+        print "IsASimpleTable is not assignable."
+
+
+
+
 class Relator(object):
+    __metaclass__ = SimpleTableMetaClass
+
     def __init__(self, db):
         self.db = db
         self.factories          = RelationshipFactories(db)
