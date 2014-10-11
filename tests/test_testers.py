@@ -16,11 +16,11 @@ def test_capture():
         def m():
             logging.__dict__[level](message)
         return m
-    cb_DEBUG    = message_maker('debug')
-    cb_INFO     = message_maker('info')
-    cb_WARNING  = message_maker('warning')
-    cb_ERROR    = message_maker('error')
-    cb_CRITICAL = message_maker('critical')
+    cb_DEBUG     = message_maker('debug')
+    cb_INFO      = message_maker('info')
+    cb_WARNING   = message_maker('warning')
+    cb_ERROR     = message_maker('error')
+    cb_CRITICAL  = message_maker('critical')
     capture(cb_DEBUG,       message,    level='DEBUG')
     capture(cb_INFO,        message,    level='INFO')
     capture(cb_WARNING,     message,    level='WARNING')

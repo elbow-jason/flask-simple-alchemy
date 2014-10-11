@@ -7,7 +7,7 @@ from flask_simple_alchemy import RelationshipFactories
 
 app = Flask(__name__)
 app.config.update(dict(SECRET_KEY="nonono",
-                       SQLALCHEMY_DATABASE_URI='sqlite:///faketest.db')
+                       SQLALCHEMY_DATABASE_URI='sqlite://')
                   )
 
 db = SQLAlchemy(app)
@@ -81,3 +81,5 @@ class OtherTable(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(db.String, unique=True)
     event_count = db.Column(db.Integer)
+
+

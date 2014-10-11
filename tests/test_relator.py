@@ -1,6 +1,15 @@
 from flask_simple_alchemy import Relator
-from testers import db, FakeTable, OtherTable
+from testers import db, app, FakeTable, OtherTable
 
+this_table = Relator(db)
+this_table.add('FakeTable')
+this_table.add('OtherTable', foreign_key='uuid')
+
+class ThirdTable(db.Model, this_table.HasOneToOneWith.FakeTable):
+    __tablename__ = 'thirdtable'
+    id = db.Column(db.Integer, primary_key=True)
+    elf = db.Column(db.Boolean(False))
+    monkey = db.Column(db.String, default='yep')
 
 def test_Relator_setattrs():
     this_table = Relator(db)
@@ -21,16 +30,29 @@ def test_Relator_setattrs():
 
 
 def test_Realtor_relationship():
-    this_table = Relator(db)
-    this_table.add('FakeTable')
-    this_table.add('OtherTable', foreign_key='uuid')
 
-    class ThirdTable(db.Model, this_table.HasOneToOneWith.FakeTable):
-        __tablename__ = 'thirdtable'
-        id = db.Column(db.Integer, primary_key=True)
 
     assert ThirdTable.faketable_id
     assert ThirdTable.faketable
+
+    with app.app_context():
+        fk = FakeTable()
+        fk.unique_name = 'gggg'
+        db.session.add(fk)
+        db.session.commit()
+        saved = FakeTable.query.filter_by(unique_name='gggg').first()
+        tt = ThirdTable()
+
+        tt.faketable_id = saved.id
+        db.session.add(tt)
+        db.session.commit()
+
+        saved2 = ThirdTable.query.filter_by(monkey='yep').first()
+    assert saved
+    assert tt
+    assert saved2
+
+
 
 
 def test_Realtor_relationship_again():
